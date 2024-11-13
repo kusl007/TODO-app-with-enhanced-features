@@ -85,32 +85,36 @@ const getTodos = async (req, res) => {
 const updateTodo = async (req, res) => {
   try {
     const taskId = req.params.id;
-    const userId = req.user.id; // Assumes req.user is set by auth middleware
+    const userId = req.user.id;  // Assumes req.user is set by authentication middleware
+    const { title, description, dueDate, priority, status } = req.body;
 
     // Find the task
-    const task = await Task.findById(taskId);
-    if (!task) {
-      return res.status(404).json({ message: "Task not found" });
+    const todo = await Todo.findById(taskId);
+    if (!todo) {
+      return res.status(404).json({ message: 'Todo not found' });
     }
 
     // Check if the user is the owner or an admin
-    console.log("userid=> ", userId, "owner id=> ", task.owner.toString());
-    if (task.owner.toString() !== userId && req.user.role !== "admin") {
-      return res.status(403).json({ message: "Access denied" });
+    if (todo.owner.toString() !== userId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'You are not authorized to update this todo' });
     }
 
-    // Update the task with request body data
-    const updatedTask = await Task.findByIdAndUpdate(taskId, req.body, {
-      new: true, // Return the updated document
-      runValidators: true, // Validate before updating
-    });
+    // Update fields if provided
+    if (title) todo.title = title;
+    if (description) todo.description = description;
+    if (dueDate) todo.dueDate = dueDate;
+    if (priority) todo.priority = priority;
+    if (status) todo.status = status;
 
-    res.json({ message: "Task updated successfully", task: updatedTask });
+    await todo.save();
+
+    res.json({ message: 'Todo updated successfully', todo });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 
 // Delete a todo item
 
