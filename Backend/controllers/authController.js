@@ -11,6 +11,7 @@ const generateToken = (id) => {
 const registerUser = async (req, res) => {
   const { username, email, password, role } = req.body;
   try {
+    console.log("i am in registratio, ","the data provided are",req.body)
     const user = await User.create({ username, email, password, role });
     res.status(201).json({
       id: user._id,
@@ -30,7 +31,9 @@ const loginUser = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (user && (await user.matchPassword(password))) {
+      console.log("Logged in sucessfully")
       res.json({
+        user:user,
         id: user._id,
         username: user.username,
         email: user.email,
