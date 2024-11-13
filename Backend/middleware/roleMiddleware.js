@@ -2,6 +2,7 @@
 
 // Checks if the user is an admin
 const isAdmin = (req, res, next) => {
+  console.log("i am in is admin check middleware")
   if (req.user && req.user.role === 'admin') {
     return next();
   } else {
