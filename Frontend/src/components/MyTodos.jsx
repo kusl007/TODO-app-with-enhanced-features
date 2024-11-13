@@ -11,6 +11,7 @@ const MyTodos = () => {
   const [search, setSearch] = useState('');
   const [dueDateFilter, setDueDateFilter] = useState('');
   const [createdDateFilter, setCreatedDateFilter] = useState('');
+  const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
   const user = JSON.parse(localStorage.getItem('user'));
   const { register, handleSubmit, reset } = useForm();
 
@@ -44,23 +45,30 @@ const MyTodos = () => {
   // Handle search input change
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    filterTodos(e.target.value, dueDateFilter, createdDateFilter);
+    filterTodos(e.target.value, dueDateFilter, createdDateFilter, sortOrder);
   };
 
   // Handle Due Date filter change
   const handleDueDateChange = (e) => {
     setDueDateFilter(e.target.value);
-    filterTodos(search, e.target.value, createdDateFilter);
+    filterTodos(search, e.target.value, createdDateFilter, sortOrder);
   };
 
   // Handle Created Date filter change
   const handleCreatedDateChange = (e) => {
     setCreatedDateFilter(e.target.value);
-    filterTodos(search, dueDateFilter, e.target.value);
+    filterTodos(search, dueDateFilter, e.target.value, sortOrder);
+  };
+
+  // Handle Sort by Due Date
+  const handleSortByDueDate = () => {
+    const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+    setSortOrder(newSortOrder);
+    filterTodos(search, dueDateFilter, createdDateFilter, newSortOrder);
   };
 
   // Filter todos based on search, Due Date, and Created Date
-  const filterTodos = (searchTerm, dueDate, createdDate) => {
+  const filterTodos = (searchTerm, dueDate, createdDate, order) => {
     let filtered = todos;
 
     // Search filter
@@ -85,6 +93,15 @@ const MyTodos = () => {
       filtered = filtered.filter((todo) => {
         const todoCreatedDate = new Date(todo.createdAt).toLocaleDateString();
         return todoCreatedDate === new Date(createdDate).toLocaleDateString();
+      });
+    }
+
+    // Sort by due date
+    if (order) {
+      filtered = filtered.sort((a, b) => {
+        const dueDateA = new Date(a.dueDate);
+        const dueDateB = new Date(b.dueDate);
+        return order === 'asc' ? dueDateA - dueDateB : dueDateB - dueDateA;
       });
     }
 
@@ -199,6 +216,14 @@ const MyTodos = () => {
         />
       </div>
 
+      {/* Sort by Due Date Button */}
+      <button
+        onClick={handleSortByDueDate}
+        className="bg-green-500 text-white p-2 rounded mb-4"
+      >
+        Sort by Due Date ({sortOrder === 'asc' ? 'Ascending' : 'Descending'})
+      </button>
+
       {filteredTodos.length === 0 ? (
         <p>No todos available</p>
       ) : (
@@ -233,85 +258,41 @@ const MyTodos = () => {
         </ul>
       )}
 
-      {/* Update Modal */}
-      {/* Update Modal */}
-{isUpdateModalOpen && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-    <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-w-full">
-      <h2 className="text-2xl font-semibold mb-4">Update Todo</h2>
-      <form onSubmit={handleSubmit(updateTodo)}>
-        <div className="mb-4">
-          <label className="block text-sm font-medium">Title</label>
-          <input
-            {...register('title')}
-            required
-            className="w-full p-2 border rounded mt-2"
-            placeholder="Enter title"
-          />
+      {/* Update Todo Modal */}
+      {isUpdateModalOpen && (
+        <div className="modal">
+          <form onSubmit={handleSubmit(updateTodo)} className="p-6 bg-white rounded">
+            <h2 className="font-bold">Update Todo</h2>
+            <input
+              type="text"
+              placeholder="Title"
+              {...register("title")}
+              className="p-2 border rounded mb-4 w-full"
+            />
+            <textarea
+              placeholder="Description"
+              {...register("description")}
+              className="p-2 border rounded mb-4 w-full"
+            />
+            <input
+              type="date"
+              {...register("dueDate")}
+              className="p-2 border rounded mb-4"
+            />
+            <select {...register("priority")} className="p-2 border rounded mb-4 w-full">
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+            <select {...register("status")} className="p-2 border rounded mb-4 w-full">
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+            </select>
+            <input type="file" {...register("file")} className="mb-4" />
+            <button type="submit" className="bg-blue-500 text-white p-2 rounded">Update</button>
+          </form>
         </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium">Description</label>
-          <textarea
-            {...register('description')}
-            required
-            className="w-full p-2 border rounded mt-2"
-            placeholder="Enter description"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium">Due Date</label>
-          <input
-            type="date"
-            {...register('dueDate')}
-            required
-            className="w-full p-2 border rounded mt-2"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium">Priority</label>
-          <input
-            type="text"
-            {...register('priority')}
-            required
-            className="w-full p-2 border rounded mt-2"
-            placeholder="Enter priority"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium">Status</label>
-          <input
-            type="text"
-            {...register('status')}
-            required
-            className="w-full p-2 border rounded mt-2"
-            placeholder="Enter status"
-          />
-        </div>
-
-        <div className="flex justify-between items-center">
-          <button
-            type="submit"
-            className="bg-blue-500 text-white p-2 rounded-lg"
-          >
-            Update Todo
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsUpdateModalOpen(false)}
-            className="bg-gray-500 text-white p-2 rounded-lg"
-          >
-            Close
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
-
+      )}
     </div>
   );
 };
