@@ -8,7 +8,9 @@ const MyTodos = () => {
   const [error, setError] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [todoToUpdate, setTodoToUpdate] = useState(null);
-  const [search, setSearch] = useState(''); // State for search input
+  const [search, setSearch] = useState('');
+  const [dueDateFilter, setDueDateFilter] = useState('');
+  const [createdDateFilter, setCreatedDateFilter] = useState('');
   const user = JSON.parse(localStorage.getItem('user'));
   const { register, handleSubmit, reset } = useForm();
 
@@ -42,22 +44,51 @@ const MyTodos = () => {
   // Handle search input change
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    filterTodos(e.target.value);
+    filterTodos(e.target.value, dueDateFilter, createdDateFilter);
   };
 
-  // Filter todos based on the search term
-  const filterTodos = (searchTerm) => {
-    if (searchTerm === '') {
-      setFilteredTodos(todos); // If search is empty, show all todos
-    } else {
-      setFilteredTodos(
-        todos.filter(
-          (todo) =>
-            todo.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            todo.description.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+  // Handle Due Date filter change
+  const handleDueDateChange = (e) => {
+    setDueDateFilter(e.target.value);
+    filterTodos(search, e.target.value, createdDateFilter);
+  };
+
+  // Handle Created Date filter change
+  const handleCreatedDateChange = (e) => {
+    setCreatedDateFilter(e.target.value);
+    filterTodos(search, dueDateFilter, e.target.value);
+  };
+
+  // Filter todos based on search, Due Date, and Created Date
+  const filterTodos = (searchTerm, dueDate, createdDate) => {
+    let filtered = todos;
+
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (todo) =>
+          todo.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          todo.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
+
+    // Due Date filter (Single date filter)
+    if (dueDate) {
+      filtered = filtered.filter((todo) => {
+        const todoDueDate = new Date(todo.dueDate).toLocaleDateString();
+        return todoDueDate === new Date(dueDate).toLocaleDateString();
+      });
+    }
+
+    // Created Date filter (Single date filter)
+    if (createdDate) {
+      filtered = filtered.filter((todo) => {
+        const todoCreatedDate = new Date(todo.createdAt).toLocaleDateString();
+        return todoCreatedDate === new Date(createdDate).toLocaleDateString();
+      });
+    }
+
+    setFilteredTodos(filtered);
   };
 
   // Handle delete todo
@@ -147,6 +178,27 @@ const MyTodos = () => {
         />
       </div>
 
+      {/* Date Filters */}
+      <div className="mb-4">
+        <label>Due Date:</label>
+        <input
+          type="date"
+          value={dueDateFilter}
+          onChange={handleDueDateChange}
+          className="p-2 border rounded"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label>Created Date:</label>
+        <input
+          type="date"
+          value={createdDateFilter}
+          onChange={handleCreatedDateChange}
+          className="p-2 border rounded"
+        />
+      </div>
+
       {filteredTodos.length === 0 ? (
         <p>No todos available</p>
       ) : (
@@ -164,15 +216,13 @@ const MyTodos = () => {
                 <div>
                   <button
                     onClick={() => deleteTodo(todo._id)}
-                    className="text-red-500 mr-4"
-                    title="Delete Todo"
+                    className="bg-red-500 text-white p-2 rounded mr-2"
                   >
                     Delete
                   </button>
                   <button
                     onClick={() => openUpdateModal(todo)}
-                    className="text-blue-500"
-                    title="Update Todo"
+                    className="bg-blue-500 text-white p-2 rounded"
                   >
                     Update
                   </button>
@@ -185,75 +235,30 @@ const MyTodos = () => {
 
       {/* Update Modal */}
       {isUpdateModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-md">
-            <h3 className="text-xl font-bold mb-4">Update Todo</h3>
-            <form onSubmit={handleSubmit(updateTodo)}>
-              <div className="mb-4">
-                <label className="block text-gray-700">Title</label>
-                <input
-                  type="text"
-                  {...register("title", { required: true })}
-                  className="w-full px-3 py-2 border rounded"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Description</label>
-                <textarea
-                  {...register("description", { required: true })}
-                  className="w-full px-3 py-2 border rounded"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Due Date</label>
-                <input
-                  type="date"
-                  {...register("dueDate", { required: true })}
-                  className="w-full px-3 py-2 border rounded"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Priority</label>
-                <select
-                  {...register("priority", { required: true })}
-                  className="w-full px-3 py-2 border rounded"
-                >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Status</label>
-                <select
-                  {...register("status", { required: true })}
-                  className="w-full px-3 py-2 border rounded"
-                >
-                  <option value="incomplete">Incomplete</option>
-                  <option value="complete">Complete</option>
-                </select>
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">File Upload</label>
-                <input
-                  type="file"
-                  {...register("file")}
-                  className="w-full px-3 py-2 border rounded"
-                />
-              </div>
-              <div className="flex justify-end">
-                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded mr-2">
-                  Save
-                </button>
-                <button
-                  onClick={() => setIsUpdateModalOpen(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
+        <div className="modal">
+          <form onSubmit={handleSubmit(updateTodo)} className="p-4">
+            <h2>Update Todo</h2>
+            <label>Title</label>
+            <input {...register('title')} required className="p-2 border rounded mb-2" />
+            <label>Description</label>
+            <textarea {...register('description')} required className="p-2 border rounded mb-2" />
+            <label>Due Date</label>
+            <input type="date" {...register('dueDate')} required className="p-2 border rounded mb-2" />
+            <label>Priority</label>
+            <input type="text" {...register('priority')} required className="p-2 border rounded mb-2" />
+            <label>Status</label>
+            <input type="text" {...register('status')} required className="p-2 border rounded mb-2" />
+            <button type="submit" className="bg-blue-500 text-white p-2 rounded">
+              Update Todo
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsUpdateModalOpen(false)}
+              className="bg-gray-500 text-white p-2 rounded ml-2"
+            >
+              Close
+            </button>
+          </form>
         </div>
       )}
     </div>
