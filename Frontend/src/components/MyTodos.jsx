@@ -3,10 +3,12 @@ import { useForm } from 'react-hook-form';
 
 const MyTodos = () => {
   const [todos, setTodos] = useState([]);
+  const [filteredTodos, setFilteredTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [todoToUpdate, setTodoToUpdate] = useState(null);
+  const [search, setSearch] = useState(''); // State for search input
   const user = JSON.parse(localStorage.getItem('user'));
   const { register, handleSubmit, reset } = useForm();
 
@@ -23,6 +25,7 @@ const MyTodos = () => {
         if (response.ok) {
           const data = await response.json();
           setTodos(data.tasks);
+          setFilteredTodos(data.tasks); // Initially set filteredTodos to all todos
         } else {
           throw new Error('Failed to fetch your todos');
         }
@@ -36,6 +39,27 @@ const MyTodos = () => {
     fetchMyTodos();
   }, []);
 
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    filterTodos(e.target.value);
+  };
+
+  // Filter todos based on the search term
+  const filterTodos = (searchTerm) => {
+    if (searchTerm === '') {
+      setFilteredTodos(todos); // If search is empty, show all todos
+    } else {
+      setFilteredTodos(
+        todos.filter(
+          (todo) =>
+            todo.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            todo.description.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+  };
+
   // Handle delete todo
   const deleteTodo = async (todoId) => {
     try {
@@ -48,7 +72,7 @@ const MyTodos = () => {
 
       const data = await response.json();
       if (response.ok) {
-        setTodos(todos.filter(todo => todo._id !== todoId));
+        setTodos(prevTodos => prevTodos.filter(todo => todo._id !== todoId));
         alert('Todo deleted successfully!');
       } else {
         alert(data.message || 'Failed to delete todo');
@@ -79,7 +103,11 @@ const MyTodos = () => {
     formData.append("dueDate", data.dueDate);
     formData.append("priority", data.priority);
     formData.append("status", data.status);
-    if (data.file[0]) formData.append("file", data.file[0]);
+
+    // File validation can go here (e.g., check file size or type)
+    if (data.file && data.file[0]) {
+      formData.append("file", data.file[0]);
+    }
 
     try {
       const response = await fetch(`http://localhost:8000/api/todos/update/${todoToUpdate._id}`, {
@@ -92,7 +120,7 @@ const MyTodos = () => {
 
       if (response.ok) {
         const updatedTodo = await response.json();
-        setTodos(todos.map(todo => (todo._id === updatedTodo._id ? updatedTodo : todo)));
+        setTodos(prevTodos => prevTodos.map(todo => (todo._id === updatedTodo._id ? updatedTodo : todo)));
         alert('Todo updated successfully!');
         setIsUpdateModalOpen(false);
       } else {
@@ -108,11 +136,22 @@ const MyTodos = () => {
 
   return (
     <div>
-      {todos.length === 0 ? (
+      {/* Search Bar */}
+      <div className="mb-4">
+        <input
+          type="text"
+          value={search}
+          onChange={handleSearchChange}
+          placeholder="Search by title or description..."
+          className="p-2 border rounded w-full"
+        />
+      </div>
+
+      {filteredTodos.length === 0 ? (
         <p>No todos available</p>
       ) : (
         <ul>
-          {todos.map(todo => (
+          {filteredTodos.map(todo => (
             <li key={todo._id} className="flex justify-between items-center p-4 border-b">
               <div>
                 <h3 className="font-bold">{todo.title}</h3>

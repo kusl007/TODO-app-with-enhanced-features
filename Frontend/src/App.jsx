@@ -24,7 +24,7 @@ function App() {
             path="/todos" 
             element={user ? <TodoList /> : <Login setUser={setUser} />} 
           />
-          <Route path="/" element={<TodoForm />} />
+          <Route path="/" element={<Login setUser={setUser} />} />
         </Routes>
       </div>
     </Router>

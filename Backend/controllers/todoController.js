@@ -147,6 +147,35 @@ const deleteTodo = async (req, res) => {
   }
 };
 
+
+// Search Todos
+const searchTodos = async (req, res) => {
+  try {
+    const { searchQuery } = req.query; // Get the search query from the query parameters
+
+    if (!searchQuery) {
+      return res.status(400).json({ message: 'Search query is required' });
+    }
+
+    // Perform search in title and description
+    const todos = await Todo.find({
+      $or: [
+        { title: { $regex: searchQuery, $options: 'i' } }, // Case-insensitive search in title
+        { description: { $regex: searchQuery, $options: 'i' } }, // Case-insensitive search in description
+      ]
+    });
+
+    if (!todos.length) {
+      return res.status(404).json({ message: 'No todos found' });
+    }
+
+    res.status(200).json({ todos });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // Filter todos
 const filterTodos = async (req, res) => {
   try {
@@ -216,4 +245,5 @@ module.exports = {
   deleteTodo,
   filterTodos,
   getMyTodos,
+  searchTodos
 };

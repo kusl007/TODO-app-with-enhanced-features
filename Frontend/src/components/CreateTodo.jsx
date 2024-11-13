@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 
 const CreateTodo = () => {
   const [title, setTitle] = useState('');
@@ -9,6 +10,7 @@ const CreateTodo = () => {
   const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
+  const [redirect, setRedirect] = useState(false); // New state for navigation
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -42,12 +44,16 @@ const CreateTodo = () => {
 
       if (response.ok) {
         setSuccessMessage('Todo created successfully!');
+        // Clear form data
         setTitle('');
         setDescription('');
         setDueDate('');
         setPriority('medium');
         setStatus('incomplete');
         setFile(null);
+        
+        // Set redirect to true after successful submission
+        setRedirect(true);
       } else {
         const data = await response.json();
         setError(data.message || 'Failed to create todo');
@@ -56,6 +62,11 @@ const CreateTodo = () => {
       setError(error.message || 'An unexpected error occurred');
     }
   };
+
+  // Redirect to dashboard if redirect is true
+  if (redirect) {
+    return <Navigate to="/dashboard" />;
+  }
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">

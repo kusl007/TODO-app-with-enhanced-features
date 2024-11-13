@@ -3,7 +3,7 @@ const express = require('express');
 const { createTask } = require('../controllers/todoController');
 const { protect } = require('../middleware/authMiddleware');
 const { isAdmin, isOwner, isEveryone } = require('../middleware/roleMiddleware');
-const { getTodos,updateTodo, deleteTodo,getMyTodos } = require('../controllers/todoController.js');
+const { getTodos,updateTodo, deleteTodo,getMyTodos ,searchTodos} = require('../controllers/todoController.js');
 
 const router = express.Router();
 
@@ -15,6 +15,9 @@ router.delete('/delete/:id', protect, deleteTodo);
 router.get('/myTodos', protect, getMyTodos)
 //filter todos
 // router.get('/filter', filterTodos); 
+
+//search 
+router.get('/search', searchTodos);
 
 
 

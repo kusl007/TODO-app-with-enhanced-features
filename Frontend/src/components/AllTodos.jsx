@@ -3,10 +3,12 @@ import { useForm } from 'react-hook-form';
 
 const AllTodos = () => {
   const [todos, setTodos] = useState([]);
+  const [filteredTodos, setFilteredTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [todoToUpdate, setTodoToUpdate] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const user = JSON.parse(localStorage.getItem('user'));
   const { register, handleSubmit, reset } = useForm();
 
@@ -23,6 +25,7 @@ const AllTodos = () => {
         if (response.ok) {
           const data = await response.json();
           setTodos(data);
+          setFilteredTodos(data); // Initialize filteredTodos with all todos
         } else {
           throw new Error('Failed to fetch todos');
         }
@@ -36,8 +39,25 @@ const AllTodos = () => {
     fetchTodos();
   }, []);
 
+  // Handle search
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    if (query === '') {
+      setFilteredTodos(todos); // If search query is empty, show all todos
+    } else {
+      const filtered = todos.filter((todo) => {
+        return (
+          todo.title.toLowerCase().includes(query) ||
+          todo.description.toLowerCase().includes(query)
+        );
+      });
+      setFilteredTodos(filtered); // Update filteredTodos based on the query
+    }
+  };
+
   // Handle delete todo
-  const deleteTodo = async (todoId) => {
+const  deleteTodo = async (todoId) => {
     try {
       const response = await fetch(`http://localhost:8000/api/todos/delete/${todoId}`, {
         method: 'DELETE',
@@ -48,6 +68,7 @@ const AllTodos = () => {
 
       if (response.ok) {
         setTodos(todos.filter(todo => todo._id !== todoId));
+        setFilteredTodos(filteredTodos.filter(todo => todo._id !== todoId)); // Update filteredTodos as well
         alert('Todo deleted successfully!');
       } else {
         alert('Failed to delete todo');
@@ -92,6 +113,7 @@ const AllTodos = () => {
       if (response.ok) {
         const updatedTodo = await response.json();
         setTodos(todos.map(todo => (todo._id === updatedTodo._id ? updatedTodo : todo)));
+        setFilteredTodos(filteredTodos.map(todo => (todo._id === updatedTodo._id ? updatedTodo : todo))); // Update filteredTodos
         alert('Todo updated successfully!');
         setIsUpdateModalOpen(false);
       } else {
@@ -107,11 +129,20 @@ const AllTodos = () => {
 
   return (
     <div>
-      {todos.length === 0 ? (
+      {/* Search bar */}
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={handleSearch}
+        placeholder="Search by title or description"
+        className="p-2 border rounded mb-4 w-full"
+      />
+
+      {filteredTodos.length === 0 ? (
         <p>No todos available</p>
       ) : (
         <ul>
-          {todos.map(todo => (
+          {filteredTodos.map(todo => (
             <li key={todo._id} className="flex justify-between items-center p-4 border-b">
               <div>
                 <h3 className="font-bold">{todo.title}</h3>
@@ -121,7 +152,7 @@ const AllTodos = () => {
                 <p>Status: {todo.status}</p>
               </div>
               {(todo.owner === user.id || user.role === 'admin') && (
-                <div>
+                <div className=''>
                   <button
                     onClick={() => deleteTodo(todo._id)}
                     className="text-red-500 mr-4"
