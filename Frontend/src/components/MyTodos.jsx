@@ -234,33 +234,84 @@ const MyTodos = () => {
       )}
 
       {/* Update Modal */}
-      {isUpdateModalOpen && (
-        <div className="modal">
-          <form onSubmit={handleSubmit(updateTodo)} className="p-4">
-            <h2>Update Todo</h2>
-            <label>Title</label>
-            <input {...register('title')} required className="p-2 border rounded mb-2" />
-            <label>Description</label>
-            <textarea {...register('description')} required className="p-2 border rounded mb-2" />
-            <label>Due Date</label>
-            <input type="date" {...register('dueDate')} required className="p-2 border rounded mb-2" />
-            <label>Priority</label>
-            <input type="text" {...register('priority')} required className="p-2 border rounded mb-2" />
-            <label>Status</label>
-            <input type="text" {...register('status')} required className="p-2 border rounded mb-2" />
-            <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-              Update Todo
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsUpdateModalOpen(false)}
-              className="bg-gray-500 text-white p-2 rounded ml-2"
-            >
-              Close
-            </button>
-          </form>
+      {/* Update Modal */}
+{isUpdateModalOpen && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-w-full">
+      <h2 className="text-2xl font-semibold mb-4">Update Todo</h2>
+      <form onSubmit={handleSubmit(updateTodo)}>
+        <div className="mb-4">
+          <label className="block text-sm font-medium">Title</label>
+          <input
+            {...register('title')}
+            required
+            className="w-full p-2 border rounded mt-2"
+            placeholder="Enter title"
+          />
         </div>
-      )}
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium">Description</label>
+          <textarea
+            {...register('description')}
+            required
+            className="w-full p-2 border rounded mt-2"
+            placeholder="Enter description"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium">Due Date</label>
+          <input
+            type="date"
+            {...register('dueDate')}
+            required
+            className="w-full p-2 border rounded mt-2"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium">Priority</label>
+          <input
+            type="text"
+            {...register('priority')}
+            required
+            className="w-full p-2 border rounded mt-2"
+            placeholder="Enter priority"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium">Status</label>
+          <input
+            type="text"
+            {...register('status')}
+            required
+            className="w-full p-2 border rounded mt-2"
+            placeholder="Enter status"
+          />
+        </div>
+
+        <div className="flex justify-between items-center">
+          <button
+            type="submit"
+            className="bg-blue-500 text-white p-2 rounded-lg"
+          >
+            Update Todo
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsUpdateModalOpen(false)}
+            className="bg-gray-500 text-white p-2 rounded-lg"
+          >
+            Close
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
