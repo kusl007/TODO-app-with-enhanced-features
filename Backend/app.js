@@ -4,6 +4,10 @@ const cors = require('cors');  // Import the cors package
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const todoRoutes = require('./routes/todoRoutes');
+const uploadFile=require('./routes/uploadFile')
+
+const cloudinary =require('./config/upload')
+
 
 const notificationRoutes = require('./routes/notificationRoutes');
 
@@ -29,13 +33,17 @@ app.use(
 // Middleware 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(fileUpload());
+app.use(fileUpload({
+	useTempFiles: true,
+	tempFileDir: '/tmp/',
+  }));
 
 
 // Define routes
 app.use('/api/auth', authRoutes);
 app.use('/api/todos', todoRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.post('/api/upload', uploadFile);
 
 // Set the server port
 const PORT = process.env.PORT || 5000;

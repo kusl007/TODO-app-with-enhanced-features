@@ -3,6 +3,7 @@ const Task = require("../models/Todo");
 const fs = require("fs");
 const path = require("path");
 const Notification = require('../models/Notification');
+const {uploadImageToCloudinary}=require('./uploadController')
 
 // Create a reusable function to create notifications
 async function createNotification(userId,activityType, message) {
@@ -18,7 +19,10 @@ const createTask = async (req, res) => {
     console.log(req.body);
     console.log("my id is ", req.user.id);
     const file = req.files?.file; // If the file exists in the request
+    console.log("i am here jst before calling cloudinaary")
 
+    const result=await uploadImageToCloudinary(file)
+    console.log(result);
     // Validate required fields
     if (!title || !description || !dueDate || !priority || !status) {
       return res.status(400).json({ message: "All fields are required." });
@@ -55,7 +59,7 @@ const createTask = async (req, res) => {
       status,
       owner:req.user.id,
       
-      file: filePath, // Save the file path if file is uploaded
+      file: result, // Save the file path if file is uploaded
     });
 
     // Save the new Todo to the database
@@ -94,10 +98,11 @@ const getTodos = async (req, res) => {
 // Update a todo item
 const updateTodo = async (req, res) => {
   try {
-    console.log("hello",req.body)
+    console.log("hello the update todo data are ",req.body)
     const taskId = req.params.id;
     const userId = req.user.id;  // Assumes req.user is set by authentication middleware
     const { title, description, dueDate, priority, status } = req.body;
+    const file=req.files?.file
 
     // Find the task
     const todo = await Todo.findById(taskId);
@@ -116,6 +121,11 @@ const updateTodo = async (req, res) => {
     if (dueDate) todo.dueDate = dueDate;
     if (priority) todo.priority = priority;
     if (status) todo.status = status;
+    if (file){
+      const result=await uploadImageToCloudinary(file)
+    console.log(result);
+    todo.file=result
+    }
 
     await todo.save();
     // Create a notification for the task updation

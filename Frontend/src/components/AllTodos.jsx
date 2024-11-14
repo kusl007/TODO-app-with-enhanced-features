@@ -111,6 +111,7 @@ const AllTodos = () => {
   };
 
   const updateTodo = async (data) => {
+    console.log("i am in update todo")
     const formData = new FormData();
     formData.append('title', data.title);
     formData.append('description', data.description);
@@ -118,6 +119,7 @@ const AllTodos = () => {
     formData.append('priority', data.priority);
     formData.append('status', data.status);
     if (data.file[0]) formData.append('file', data.file[0]);
+    console.log("i am file ",data.file[0])
 
     try {
       const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/todos/update/${todoToUpdate._id}`, {
