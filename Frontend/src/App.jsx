@@ -10,6 +10,7 @@ import MyTodos from './components/MyTodos';
 import CreateTodo from './components/CreateTodo';
 import Notifications from './components/Notifications';
 import Home from './components/Home';
+import Navbar from './components/Navbar';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -17,6 +18,7 @@ function App() {
   return (
     <Router>
       <div className="App">
+        <Navbar/>
         <Routes>  
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login setUser={setUser} />} />

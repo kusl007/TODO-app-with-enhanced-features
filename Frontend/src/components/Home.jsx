@@ -43,7 +43,7 @@ const Home = () => {
               to={`/notifications/${id}`}
               className="text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md shadow"
             >
-              Notifications
+              Notifications Log
             </Link>
           )}
 
