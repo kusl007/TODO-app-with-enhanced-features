@@ -13,11 +13,6 @@ router.get('/',protect,getTodos);
 router.put('/update/:id', protect, updateTodo);
 router.delete('/delete/:id', protect, deleteTodo);
 router.get('/myTodos', protect, getMyTodos)
-//filter todos
-// router.get('/filter', filterTodos); 
-
-//search 
-router.get('/search', searchTodos);
 
 
 

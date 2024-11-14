@@ -2,6 +2,13 @@
 const Task = require("../models/Todo");
 const fs = require("fs");
 const path = require("path");
+const Notification = require('../models/Notification');
+
+// Create a reusable function to create notifications
+async function createNotification(userId,activityType, message) {
+  console.log("hello from create notification")
+ await Notification.create({ userId, activityType,message });
+}
 
 // Create a new task
 const createTask = async (req, res) => {
@@ -53,6 +60,9 @@ const createTask = async (req, res) => {
 
     // Save the new Todo to the database
     await newTodo.save();
+
+    // Create a notification for the task creation
+    await createNotification(req.user.id, `Created a new task`, title);
 
     res
       .status(201)
@@ -108,6 +118,8 @@ const updateTodo = async (req, res) => {
     if (status) todo.status = status;
 
     await todo.save();
+    // Create a notification for the task updation
+    await createNotification(req.user.id, `updated the task`, title);
 
     res.json({ message: 'Todo updated successfully', todo });
   } catch (error) {
@@ -140,6 +152,8 @@ const deleteTodo = async (req, res) => {
 
     // delete the task with request body data
     await Todo.findByIdAndDelete(taskId);
+    // Create a notification for the task deletion
+    await createNotification(req.user.id, `deleted the task`, "");
 
     res.json({ message: "Task deleted successfully" });
   } catch (error) {
@@ -149,71 +163,9 @@ const deleteTodo = async (req, res) => {
 };
 
 
-// Search Todos
-const searchTodos = async (req, res) => {
-  try {
-    const { searchQuery } = req.query; // Get the search query from the query parameters
 
-    if (!searchQuery) {
-      return res.status(400).json({ message: 'Search query is required' });
-    }
 
-    // Perform search in title and description
-    const todos = await Todo.find({
-      $or: [
-        { title: { $regex: searchQuery, $options: 'i' } }, // Case-insensitive search in title
-        { description: { $regex: searchQuery, $options: 'i' } }, // Case-insensitive search in description
-      ]
-    });
 
-    if (!todos.length) {
-      return res.status(404).json({ message: 'No todos found' });
-    }
-
-    res.status(200).json({ todos });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-// Filter todos
-const filterTodos = async (req, res) => {
-  try {
-    const { name, sortBy, filterBy, status } = req.query;
-    let query = {};
-
-    // Filter todos by name (title or user name)
-    if (name) {
-      // Check if 'name' refers to title or user name
-      query.title = { $regex: name, $options: "i" }; // Case-insensitive search for title
-    }
-
-    // Filter by status
-    if (status) {
-      query.status = status;
-    }
-
-    // Sort options
-    const sortOptions = {};
-    if (sortBy === "dueDate") {
-      sortOptions.dueDate = 1; // Ascending order (use -1 for descending order)
-    }
-
-    // Filter by creation date (if filterBy is 'createdAt')
-    if (filterBy === "createdAt") {
-      query.createdAt = { $gte: new Date("2024-01-01") }; // Example: filter todos after January 1, 2024
-    }
-
-    // Retrieve todos with applied query, sort, and filter
-    const todos = await Todo.find(query).sort(sortOptions);
-
-    res.status(200).json(todos);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
 
 // Controller to fetch all tasks created by the authenticated user
 
@@ -244,7 +196,5 @@ module.exports = {
   getTodos,
   updateTodo,
   deleteTodo,
-  filterTodos,
   getMyTodos,
-  searchTodos
 };

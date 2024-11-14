@@ -5,6 +5,8 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const todoRoutes = require('./routes/todoRoutes');
 
+const notificationRoutes = require('./routes/notificationRoutes');
+
 
 const fileUpload = require('express-fileupload');
 const path = require('path');
@@ -33,6 +35,7 @@ app.use(fileUpload());
 // Define routes
 app.use('/api/auth', authRoutes);
 app.use('/api/todos', todoRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Set the server port
 const PORT = process.env.PORT || 5000;

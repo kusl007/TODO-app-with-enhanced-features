@@ -8,6 +8,8 @@ import Dashboard from './components/Dashboard';
 import AllTodos from './components/AllTodos';
 import MyTodos from './components/MyTodos';
 import CreateTodo from './components/CreateTodo';
+import Notifications from './components/Notifications';
+import Home from './components/Home';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -20,11 +22,12 @@ function App() {
           <Route path="/login" element={<Login setUser={setUser} />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/create" element={<CreateTodo />} />
+          <Route path="/notifications/:id" element={<Notifications />} />
           <Route 
             path="/todos" 
             element={user ? <TodoList /> : <Login setUser={setUser} />} 
           />
-          <Route path="/" element={<Login setUser={setUser} />} />
+          <Route path="/" element={<Home/>} />
         </Routes>
       </div>
     </Router>

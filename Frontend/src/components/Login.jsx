@@ -27,8 +27,10 @@ const Login = () => {
         const responseData = await response.json();
         
         // Store the token and user data in localStorage
+        console.log("i am response data id",responseData.id)
         localStorage.setItem('token', responseData.token);
         localStorage.setItem('user', JSON.stringify(responseData.user)); // Store user data as a JSON string
+        localStorage.setItem('id', responseData.id); // Store user data as a JSON string
 
         alert('Login successful!');
         navigate('/dashboard'); // Redirect to the dashboard or home page after login

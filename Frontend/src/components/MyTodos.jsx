@@ -24,13 +24,14 @@ const MyTodos = () => {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
         });
+        
 
         if (response.ok) {
           const data = await response.json();
           setTodos(data.tasks);
           setFilteredTodos(data.tasks); // Initially set filteredTodos to all todos
         } else {
-          throw new Error('Failed to fetch your todos');
+          throw new Error('No data found');
         }
       } catch (err) {
         setError(err.message);
