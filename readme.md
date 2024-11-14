@@ -68,3 +68,16 @@ This project is a basic Todo application built using the MERN stack (MongoDB, Ex
 - Notifications appear on first login.
 
 
+## Installation and Setup
+
+### 1. Clone the repository:
+```bash
+git https://github.com/kusl007/TODO-app-with-enhanced-features
+cd TODO-app-with-enhanced-features
+
+### 2. Clone the repository:
+
+
+- Navigate to the backend folder:
+```bash
+cd backend
