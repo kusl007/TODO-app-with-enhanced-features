@@ -15,6 +15,10 @@ const Dashboard = () => {
         <div className='flex justify-between'>
 
       <h2 className="text-2xl font-bold mb-4">Dashboard</h2>
+
+      <Link to='/'>
+      <h2 className="text-2xl font-bold mb-4">Home</h2>
+      </Link>
       <Link to='/create'>
       <h2 className="text-2xl font-bold mb-4">Create Todo</h2>
       </Link>

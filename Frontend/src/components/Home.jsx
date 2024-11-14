@@ -32,7 +32,7 @@ const Home = () => {
 
         <div className="flex flex-col items-center space-y-4">
           <Link
-            to="/create-todo"
+            to="/create"
             className="text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md shadow"
           >
             Create Todo
@@ -48,7 +48,7 @@ const Home = () => {
           )}
 
           <Link
-            to="/todos"
+            to="/dashboard"
             className="text-white bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded-md shadow"
           >
             View Todos
