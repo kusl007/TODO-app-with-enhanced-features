@@ -116,6 +116,6 @@ VITE_BASE_URI="http://localhost:8000"  # URL of the backend API
 ```bash
 npm run dev
 ```
-### The application should now be running at http://localhost:3000 (by default). You can view the app in your browser at this URL.
+### The application should now be running at http://localhost:5173 (by default). You can view the app in your browser at this URL.
 
 
