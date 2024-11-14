@@ -26,7 +26,7 @@ const Home = () => {
             <Link to="/register" className="text-blue-500 hover:underline">
               register
             </Link>{" "}
-            to get started.
+            to get started. 
           </p>
         )}
 
