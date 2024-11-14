@@ -15,7 +15,7 @@ const Login = () => {
   // Handle form submission
   const onSubmit = async (data) => {
     try {
-      const response = await fetch('http://localhost:8000/api/auth/login', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

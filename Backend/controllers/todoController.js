@@ -84,6 +84,7 @@ const getTodos = async (req, res) => {
 // Update a todo item
 const updateTodo = async (req, res) => {
   try {
+    console.log("hello",req.body)
     const taskId = req.params.id;
     const userId = req.user.id;  // Assumes req.user is set by authentication middleware
     const { title, description, dueDate, priority, status } = req.body;

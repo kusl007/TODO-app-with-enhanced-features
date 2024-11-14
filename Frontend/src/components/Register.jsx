@@ -16,7 +16,7 @@ const Register = () => {
   // Handle form submission
   const onSubmit = async (data) => {
     try {
-      const response = await fetch('http://localhost:8000/api/auth/register', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

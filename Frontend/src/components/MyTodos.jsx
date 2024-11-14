@@ -18,7 +18,7 @@ const MyTodos = () => {
   useEffect(() => {
     const fetchMyTodos = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/todos/myTodos', {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/todos/myTodos`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -111,7 +111,7 @@ const MyTodos = () => {
   // Handle delete todo
   const deleteTodo = async (todoId) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/todos/delete/${todoId}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/todos/delete/${todoId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -158,12 +158,13 @@ const MyTodos = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/api/todos/update/${todoToUpdate._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/todos/update/${todoToUpdate._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: formData,
+        
       });
 
       if (response.ok) {
@@ -232,8 +233,11 @@ const MyTodos = () => {
             <li key={todo._id} className="flex justify-between items-center p-4 border-b">
               <div>
                 <h3 className="font-bold">{todo.title}</h3>
+                <img src={todo.file} alt="TODO" className='w-24 h-24 rounded-full m-4' />
+
                 <p>{todo.description}</p>
                 <p>Due Date: {new Date(todo.dueDate).toLocaleDateString()}</p>
+                <p>created At: {new Date(todo.createdAt).toLocaleDateString()}</p>
                 <p>Priority: {todo.priority}</p>
                 <p>Status: {todo.status}</p>
               </div>
@@ -260,39 +264,63 @@ const MyTodos = () => {
 
       {/* Update Todo Modal */}
       {isUpdateModalOpen && (
-        <div className="modal">
-          <form onSubmit={handleSubmit(updateTodo)} className="p-6 bg-white rounded">
-            <h2 className="font-bold">Update Todo</h2>
-            <input
-              type="text"
-              placeholder="Title"
-              {...register("title")}
-              className="p-2 border rounded mb-4 w-full"
-            />
-            <textarea
-              placeholder="Description"
-              {...register("description")}
-              className="p-2 border rounded mb-4 w-full"
-            />
-            <input
-              type="date"
-              {...register("dueDate")}
-              className="p-2 border rounded mb-4"
-            />
-            <select {...register("priority")} className="p-2 border rounded mb-4 w-full">
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-            </select>
-            <select {...register("status")} className="p-2 border rounded mb-4 w-full">
-              <option value="pending">Pending</option>
-              <option value="completed">Completed</option>
-            </select>
-            <input type="file" {...register("file")} className="mb-4" />
-            <button type="submit" className="bg-blue-500 text-white p-2 rounded">Update</button>
-          </form>
+  <div className="modal-overlay flex justify-center items-center fixed inset-0 bg-gray-500 bg-opacity-50">
+    <div className="modal flex flex-col p-6 bg-white rounded-t-lg w-full max-w-lg">
+      <h2 className="font-bold text-xl mb-4">Update Todo</h2>
+      <form onSubmit={handleSubmit(updateTodo)}>
+        <label className="block mb-1 font-medium text-gray-700">Title</label>
+        <input
+          type="text"
+          placeholder="Title"
+          {...register("title")}
+          className="p-2 border rounded mb-4 w-full"
+        />
+
+        <label className="block mb-1 font-medium text-gray-700">Description</label>
+        <textarea
+          placeholder="Description"
+          {...register("description")}
+          className="p-2 border rounded mb-4 w-full"
+        />
+
+        <label className="block mb-1 font-medium text-gray-700">Due Date</label>
+        <input
+          type="date"
+          {...register("dueDate")}
+          className="p-2 border rounded mb-4 w-full"
+        />
+
+        <label className="block mb-1 font-medium text-gray-700">Priority</label>
+        <select {...register("priority")} className="p-2 border rounded mb-4 w-full">
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+
+        <label className="block mb-1 font-medium text-gray-700">Status</label>
+        <select {...register("status")} className="p-2 border rounded mb-4 w-full">
+          <option value="complete">Complete</option>
+          <option value="incomplete">Incomplete</option>
+        </select>
+
+        <label className="block mb-1 font-medium text-gray-700">File Upload</label>
+        <input type="file" {...register("file")} className="mb-4" />
+
+        <div className="flex justify-between">
+          <button type="submit" className="bg-blue-500 text-white p-2 rounded">Update</button>
+          <button
+            type="button"
+            onClick={() => setIsUpdateModalOpen(false)}
+            className="bg-gray-500 text-white p-2 rounded"
+          >
+            Close
+          </button>
         </div>
-      )}
+      </form>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

@@ -34,7 +34,7 @@ const CreateTodo = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8000/api/todos', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/todos`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
