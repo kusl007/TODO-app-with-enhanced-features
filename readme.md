@@ -73,11 +73,49 @@ This project is a basic Todo application built using the MERN stack (MongoDB, Ex
 ### 1. Clone the repository:
 ```bash
 git https://github.com/kusl007/TODO-app-with-enhanced-features
-cd TODO-app-with-enhanced-features
+cd TODO-app-with-enhanced-features 
+```
 
-### 2. Clone the repository:
-
-
+## 2.Backend Setup:
 - Navigate to the backend folder:
 ```bash
-cd backend
+cd Backend
+```
+- Install dependencies:
+```bash
+npm install
+```
+
+- Create a .env file in the root of the backend folder and add the following environment variables:
+
+```bash
+MONGO_URI=your_mongo_database_uri
+JWT_SECRET=your_jwt_secret_key
+PORT=your_preferred_port
+```
+- Start the server:
+```bash
+npm run dev 
+```
+
+## Frontend Setup
+
+### 1. Navigate to the frontend folder:
+```bash
+cd Frontend
+```
+### 2. Install dependencies:
+```bash
+npm install
+```
+### 3. Configure environment variables:
+```bash
+VITE_BASE_URI="http://localhost:8000"  # URL of the backend API
+```
+### 4. Start the frontend development server:
+```bash
+npm run dev
+```
+### The application should now be running at http://localhost:3000 (by default). You can view the app in your browser at this URL.
+
+
